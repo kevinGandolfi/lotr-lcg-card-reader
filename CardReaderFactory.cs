@@ -19,7 +19,7 @@ namespace LOTR_CR
           return new EventCardReader();
         case CardType.Attachment:
         case CardType.Treasure:
-          return new EquipmentCaradReader();
+          return new EquipmentCardReader();
         case CardType.Location:
           return new LocationCardReader();
         case CardType.Objective:

@@ -2,7 +2,7 @@
 
 namespace LOTR_CR.CardReaders
 {
-  public class EquipmentCaradReader : CardReader
+  public class EquipmentCardReader : CardReader
   {
   }
 }
