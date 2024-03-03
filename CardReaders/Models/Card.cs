@@ -5,6 +5,8 @@ namespace LOTR_CR.CardReaders.Models
 {
   public class Card
   {
+    private MagickImage _bottom_label = new();
+
     #region PROPERTIES
 
     public CardType Type { get; set; }
@@ -63,7 +65,11 @@ namespace LOTR_CR.CardReaders.Models
     /// <exception cref="NotImplementedException"></exception>
     public void GetCardType()
     {
-      //var path = @"C:\Users\kgandolfi\source\repos\LOTR_CR";
+      this.GetBottomLabel();
+      //string? bottomLabelFileName = "./bottom_label.jpg";
+      this._bottom_label.Write(@"D:\bottom_label.jpg");
+      //this._bottom_label.Write(bottomLabelFileName);
+
       using (var engine = new TesseractEngine("./tessdata", "fra", EngineMode.Default))
       {
         using (var img = Pix.LoadFromFile(@"D:\bottom_label.jpg"))
@@ -80,13 +86,13 @@ namespace LOTR_CR.CardReaders.Models
     /// Gets the bottom part of a card in order to later read it.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public MagickImage GetBottomLabel()
+    private void GetBottomLabel()
     {
       MagickImage image = this.CardImage;
-      image.Crop(0, 45, Gravity.South);
-      image.Extent(image.Width, image.Height - 15, Gravity.North);
+      image.Crop(0, 43, Gravity.South);
+      image.Extent(image.Width, image.Height - 29, Gravity.North);
       image.Extent(140, image.Height, Gravity.Center);
-      return image;
+      this._bottom_label = image;
     }
 
     #endregion PUBLIC METHODS
