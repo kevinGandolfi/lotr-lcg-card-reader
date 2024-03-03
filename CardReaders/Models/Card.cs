@@ -57,21 +57,23 @@ namespace LOTR_CR.CardReaders.Models
       };
     }
 
+    /// <summary>
+    /// Gets the card type of the current card.
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
     public void GetCardType()
     {
-      //var path = "YourSolutionDirectoryPath";
-      //using (var engine = new TesseractEngine(path + Path.DirectorySeparatorChar + "tessdata", "fra", EngineMode.TesseractAndLstm))
-      //{
-      //  using (var img = Pix.LoadFromFile(sourceFilePath))
-      //  {
-      //    using (var page = engine.Process(img))
-      //    {
-      //      var text = page.GetText();
-      //      // text variable contains a string with all words found
-      //    }
-      //  }
-      //}
-      throw new NotImplementedException();
+      //var path = @"C:\Users\kgandolfi\source\repos\LOTR_CR";
+      using (var engine = new TesseractEngine("./tessdata", "fra", EngineMode.Default))
+      {
+        using (var img = Pix.LoadFromFile(@"D:\bottom_label.jpg"))
+        {
+          using (var page = engine.Process(img))
+          {
+            var text = page.GetText();
+          }
+        }
+      }
     }
 
     /// <summary>
@@ -83,6 +85,7 @@ namespace LOTR_CR.CardReaders.Models
       MagickImage image = this.CardImage;
       image.Crop(0, 45, Gravity.South);
       image.Extent(image.Width, image.Height - 15, Gravity.North);
+      image.Extent(140, image.Height, Gravity.Center);
       return image;
     }
 
