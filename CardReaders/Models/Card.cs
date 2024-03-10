@@ -10,7 +10,7 @@ namespace LOTR_CR.CardReaders.Models
   {
     #region CONSTANTS
 
-    private const string _COLOR_SPECIFIC_TO_PLAYER_CARDS = "#E2CFC8";
+    private const string _COLOR_SPECIFIC_TO_PLAYER_CARDS = "#898F8F";
     private const string _BOTTOM_LABEL_FILE_NAME = @"..\..\..\bottom_label.jpg";
 
     #endregion CONSTANTS
@@ -96,43 +96,33 @@ namespace LOTR_CR.CardReaders.Models
         return;
       }
 
-      //if (this.IsEncounterCard())
-      //{
-      //  this.GetBottomLabelOfEncounterCard();
-      //}
-      //else
-      //{
-      //  this.GetBottomLabelOfPlayerCard();
-      //}
-      this.GetBottomLabel();
+      if (this.IsObjectiveCard())
+      {
+        this.GetBottomLabelOfObjectiveCard();
+      }
+      else
+      {
+        this.GetBottomLabel();
+      }
       string labelText = this.GetLabelText();
-
+      Console.WriteLine(labelText);
     }
 
     /// <summary>
-    /// Gets the bottom part of a card in order to later read it.
+    /// Gets the bottom label of an objective card and stores it in a field.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    private void GetBottomLabelOfEncounterCard()
+    private void GetBottomLabelOfObjectiveCard()
     {
-      this._bottom_label.Crop(0, 38, Gravity.South);
-      this._bottom_label.Extent(this._bottom_label.Width, this._bottom_label.Height - 20, Gravity.North);
+      this._bottom_label.Crop(0, 43, Gravity.South);
+      this._bottom_label.Extent(this._bottom_label.Width, this._bottom_label.Height - 25, Gravity.North);
       this._bottom_label.Extent(140, this._bottom_label.Height, Gravity.Center);
       this._bottom_label.Write(_BOTTOM_LABEL_FILE_NAME);
     }
 
     /// <summary>
-    /// Gets the bottom part of a card in order to later read it.
+    /// Gets the bottom label of a card and stores it in a field.
     /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
-    private void GetBottomLabelOfPlayerCard()
-    {
-      this._bottom_label.Crop(0, 38, Gravity.South);
-      this._bottom_label.Extent(this._bottom_label.Width, this._bottom_label.Height - 20, Gravity.North);
-      this._bottom_label.Extent(140, this._bottom_label.Height, Gravity.Center);
-      this._bottom_label.Write(_BOTTOM_LABEL_FILE_NAME);
-    }
-
     private void GetBottomLabel()
     {
       this._bottom_label.Crop(0, 38, Gravity.South);
@@ -143,15 +133,15 @@ namespace LOTR_CR.CardReaders.Models
     }
 
     /// <summary>
-    /// Checks if a color exists in a zone where it may be found in a player card.
+    /// Checks if a color exists in a zone where it may be found in an Objective card.
     /// </summary>
     /// <returns>False if the color exists, true otherwise.</returns>
-    private bool IsEncounterCard()
+    private bool IsObjectiveCard()
     {
-      int startX = 101; // X-coordinate of the starting point of the zone
-      int startY = 526; // Y-coordinate of the starting point of the zone
-      int width = 10; // Width of the zone
-      int height = 10; // Height of the zone
+      int startX = 30; // X-coordinate of the starting point of the zone
+      int startY = 536; // Y-coordinate of the starting point of the zone
+      int width = 4; // Width of the zone
+      int height = 5; // Height of the zone
 
       MagickGeometry geometry = new MagickGeometry(startX, startY, width, height);
       IMagickImage<ushort> image = this.CardImage.Clone();
@@ -164,14 +154,18 @@ namespace LOTR_CR.CardReaders.Models
         {
           if ((MagickColor)pixel.ToColor()! == targetColor)
           {
-            return false;
+            return true;
           }
         }
       }
 
-      return true;
+      return false;
     }
 
+    /// <summary>
+    /// Gets the label text of a card.
+    /// </summary>
+    /// <returns></returns>
     private string GetLabelText()
     {
       string labelText = string.Empty;
