@@ -10,7 +10,7 @@ namespace LOTR_CR.CardReaders.Models
   {
     #region CONSTANTS
 
-    private const string _COLOR_SPECIFIC_TO_PLAYER_CARDS = "#898F8F";
+    private const string _COLOR_SPECIFIC_TO_OBJECTIVE_CARDS = "#898F8F";
     private const string _BOTTOM_LABEL_FILE_NAME = @"..\..\..\bottom_label.jpg";
 
     #endregion CONSTANTS
@@ -146,7 +146,7 @@ namespace LOTR_CR.CardReaders.Models
       MagickGeometry geometry = new MagickGeometry(startX, startY, width, height);
       IMagickImage<ushort> image = this.CardImage.Clone();
       image.Crop(geometry);
-      MagickColor targetColor = new(_COLOR_SPECIFIC_TO_PLAYER_CARDS);
+      MagickColor targetColor = new(_COLOR_SPECIFIC_TO_OBJECTIVE_CARDS);
 
       using (IPixelCollection<ushort> pixels = image.GetPixels())
       {
