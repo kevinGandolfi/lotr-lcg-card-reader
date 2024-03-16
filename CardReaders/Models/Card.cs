@@ -12,6 +12,8 @@ namespace LOTR_CR.CardReaders.Models
 
     private const string _COLOR_SPECIFIC_TO_OBJECTIVE_CARDS = "#898F8F";
     private const string _BOTTOM_LABEL_FILE_NAME = @"..\..\..\bottom_label.jpg";
+    private const string _TESSDATA_LOCATION = @"..\..\..\tessdata";
+    private const string _LANGUAGE = "fra";
 
     #endregion CONSTANTS
 
@@ -40,9 +42,13 @@ namespace LOTR_CR.CardReaders.Models
 
     #endregion PROPERTIES
 
+    /// <summary>
+    /// Constructor that loads a picture hosted online.
+    /// </summary>
+    /// <param name="imageUrl"></param>
     public Card(string imageUrl)
     {
-      MemoryStream stream = this.GetMemoryStreamFromHostedImage(imageUrl);
+      MemoryStream stream = Card.GetMemoryStreamFromHostedImage(imageUrl);
       this.Load(stream);
       this._bottom_label = (MagickImage)this.CardImage.Clone();
       this.GetCardType();
@@ -56,7 +62,7 @@ namespace LOTR_CR.CardReaders.Models
     /// <param name="imageUrl">URL of the picture.</param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    private MemoryStream GetMemoryStreamFromHostedImage(string imageUrl)
+    private static MemoryStream GetMemoryStreamFromHostedImage(string imageUrl)
     {
       using (var httpClient = new HttpClient())
       {
@@ -87,7 +93,6 @@ namespace LOTR_CR.CardReaders.Models
     /// <summary>
     /// Gets the card type of the current card.
     /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
     private void GetCardType()
     {
       if (this.CardImage.Width == 560 && this.CardImage.Height == 394)
@@ -105,7 +110,35 @@ namespace LOTR_CR.CardReaders.Models
         this.GetBottomLabel();
       }
       string labelText = this.GetLabelText();
-      Console.WriteLine(labelText);
+      labelText = this.ExtractLetters(labelText);
+
+      switch (labelText)
+      {
+        case "heros":
+          this.Type = CardType.Hero;
+          break;
+        case "allié":
+          this.Type = CardType.Ally;
+          break;
+        case string s when s.Contains("évén"):
+          this.Type = CardType.Event;
+          break;
+        case string s when s.Contains("attachemen"):
+          this.Type = CardType.Attachment;
+          break;
+        case "tresor":
+          this.Type = CardType.Treasure;
+          break;
+        case "li£u":
+          this.Type = CardType.Location;
+          break;
+        case string s when s.Contains("traîtrise"):
+          this.Type = CardType.Treachery;
+          break;
+        case string s when s.Contains("ïçmscnc:"): // This case does not properly work with Tesseract, but it works with lstm
+          this.Type = CardType.Objective;
+          break;
+      }
     }
 
     /// <summary>
@@ -170,11 +203,11 @@ namespace LOTR_CR.CardReaders.Models
     {
       string labelText = string.Empty;
 
-      using (var engine = new TesseractEngine(Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\tessdata")), "fra", EngineMode.TesseractAndLstm))
+      using (var engine = new TesseractEngine(Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _TESSDATA_LOCATION)), _LANGUAGE, EngineMode.TesseractOnly))
       {
         using (var img = Pix.LoadFromFile(_BOTTOM_LABEL_FILE_NAME))
         {
-          var path = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\tessdata"));
+          var path = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _TESSDATA_LOCATION));
           Console.WriteLine($"tessdata: {path}");
           using (var page = engine.Process(img, PageSegMode.SingleWord))
           {
@@ -183,6 +216,18 @@ namespace LOTR_CR.CardReaders.Models
         }
       }
 
+      return labelText;
+    }
+
+    private string ExtractLetters(string labelText)
+    {
+      labelText = labelText.Replace("_", "");
+      labelText = labelText.Replace("-", "");
+      labelText = labelText.Replace(".", "");
+      labelText = labelText.Replace("”", "");
+      labelText = labelText.Replace("—", "");
+      labelText = labelText.Trim();
+      labelText = labelText.ToLower();
       return labelText;
     }
 
