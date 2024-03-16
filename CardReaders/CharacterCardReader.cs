@@ -16,7 +16,7 @@ namespace LOTR_CR.CardReaders
 
     public override void GetCardTitle()
     {
-      throw new NotImplementedException();
+      throw new InvalidOperationException();
     }
   }
 }
