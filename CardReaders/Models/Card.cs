@@ -1,5 +1,7 @@
-﻿using ImageMagick;
+﻿using System.Drawing;
+using ImageMagick;
 using Tesseract;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace LOTR_CR.CardReaders.Models
 {
@@ -19,7 +21,7 @@ namespace LOTR_CR.CardReaders.Models
 
     #region FIELDS
 
-    private MagickImage _bottom_label;
+    private readonly MagickImage _bottom_label;
 
     #endregion FIELDS
 
@@ -40,43 +42,25 @@ namespace LOTR_CR.CardReaders.Models
     /// </summary>
     public MagickImage CardImage { get; set; } = new();
 
+    /// <summary>
+    /// URL of the card.
+    /// </summary>
+    public string Url { get; set; } = String.Empty;
+
     #endregion PROPERTIES
 
     /// <summary>
     /// Constructor that loads a picture hosted online.
     /// </summary>
     /// <param name="imageUrl"></param>
-    public Card(string imageUrl)
+    public Card(MemoryStream imageStream)
     {
-      MemoryStream stream = Card.GetMemoryStreamFromHostedImage(imageUrl);
-      this.Load(stream);
+      this.Load(imageStream);
       this._bottom_label = (MagickImage)this.CardImage.Clone();
       this.GetCardType();
     }
 
     #region PRIVATE METHODS
-
-    /// <summary>
-    /// Gets a stream of a picture hosted on the internet.
-    /// </summary>
-    /// <param name="imageUrl">URL of the picture.</param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
-    private static MemoryStream GetMemoryStreamFromHostedImage(string imageUrl)
-    {
-      using (var httpClient = new HttpClient())
-      {
-        try
-        {
-          byte[] response = httpClient.GetByteArrayAsync(imageUrl).Result;
-          return new MemoryStream(response);
-        }
-        catch (Exception)
-        {
-          throw new InvalidOperationException("The image could not be found");
-        }
-      }
-    }
 
     /// <summary>
     /// Loads an image and stores it into the Image property.
@@ -114,28 +98,31 @@ namespace LOTR_CR.CardReaders.Models
 
       switch (labelText)
       {
-        case "heros":
+        case string s when s.First() == 'h':
           this.Type = CardType.Hero;
           break;
-        case "allié":
+        case string s when s.Contains("lie") || s.Contains("all"):
           this.Type = CardType.Ally;
           break;
-        case string s when s.Contains("évén"):
+        case string s when s.Contains("évén") || s.Contains("évèn") || s.Contains("èvén"):
           this.Type = CardType.Event;
           break;
-        case string s when s.Contains("attachemen"):
+        case string s when s.Contains("attachemen") || s.Contains("ement") || s.Contains("at"):
           this.Type = CardType.Attachment;
           break;
-        case "tresor":
+        case string s when s.Contains("tré") || s.Contains("sor") || s == "tresor":
           this.Type = CardType.Treasure;
           break;
-        case "li£u":
+        case string s when s.Contains("li"):
           this.Type = CardType.Location;
           break;
-        case string s when s.Contains("traîtrise"):
+        case string s when s.Contains("tris") || s.Contains("î") || s.Contains("ise") || s.Contains("aî") || s.Contains("iraï"):
           this.Type = CardType.Treachery;
           break;
-        case string s when s.Contains("ïçmscnc:"): // This case does not properly work with Tesseract, but it works with lstm
+        case string s when s.Contains("nnemi") || s.Contains("rameur") || s.Contains("nuinus") || s.Contains("nne") || s.Contains("nn"):
+          this.Type = CardType.Enemy;
+          break;
+        default:
           this.Type = CardType.Objective;
           break;
       }
@@ -144,7 +131,6 @@ namespace LOTR_CR.CardReaders.Models
     /// <summary>
     /// Gets the bottom label of an objective card and stores it in a field.
     /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
     private void GetBottomLabelOfObjectiveCard()
     {
       this._bottom_label.Crop(0, 43, Gravity.South);
@@ -158,17 +144,18 @@ namespace LOTR_CR.CardReaders.Models
     /// </summary>
     private void GetBottomLabel()
     {
-      this._bottom_label.Crop(0, 38, Gravity.South);
-      this._bottom_label.Extent(this._bottom_label.Width, this._bottom_label.Height - 20, Gravity.North);
+      this._bottom_label.Crop(0, 36, Gravity.South);
+      this._bottom_label.Extent(this._bottom_label.Width, this._bottom_label.Height - 19, Gravity.North);
       this._bottom_label.Extent(140, this._bottom_label.Height, Gravity.Center);
-      this._bottom_label.BackgroundColor = MagickColors.White;
-      this._bottom_label.Write(_BOTTOM_LABEL_FILE_NAME);
+      this._bottom_label.Grayscale();
+      this._bottom_label.MedianFilter(1);
+      this._bottom_label.Write(_BOTTOM_LABEL_FILE_NAME); // DEBUG
     }
 
     /// <summary>
     /// Checks if a color exists in a zone where it may be found in an Objective card.
     /// </summary>
-    /// <returns>False if the color exists, true otherwise.</returns>
+    /// <returns>True if the color exists, false otherwise.</returns>
     private bool IsObjectiveCard()
     {
       int startX = 30; // X-coordinate of the starting point of the zone
@@ -208,7 +195,6 @@ namespace LOTR_CR.CardReaders.Models
         using (var img = Pix.LoadFromFile(_BOTTOM_LABEL_FILE_NAME))
         {
           var path = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _TESSDATA_LOCATION));
-          Console.WriteLine($"tessdata: {path}");
           using (var page = engine.Process(img, PageSegMode.SingleWord))
           {
             labelText = page.GetText();
@@ -219,6 +205,11 @@ namespace LOTR_CR.CardReaders.Models
       return labelText;
     }
 
+    /// <summary>
+    /// Removes parasite characters from the tesseract result.
+    /// </summary>
+    /// <param name="labelText"></param>
+    /// <returns></returns>
     private string ExtractLetters(string labelText)
     {
       labelText = labelText.Replace("_", "");
