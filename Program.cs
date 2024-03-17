@@ -11,6 +11,8 @@ class Program
   private const string FILE_EXTENSION = ".jpg";
   private static short _cardNumber = 1;
   private static string _url = string.Empty;
+  private static string _directoryPath = @"..\..\..\CardDescriptions\";
+  private static List<string> _urlsList = [];
 
   static void Main(string[] args)
   {
@@ -18,18 +20,24 @@ class Program
 
     Console.WriteLine("Welcome to the card reader of Lord of the Rings: the Card Game");
     _url = BuildUrl(_cardNumber);
+    int a = 1;
     while (true)
     {
       try
       {
-        MemoryStream imageStream = GetMemoryStreamFromHostedImage();
-        Card card = new(imageStream);
-        CardReader cardReader = CardReaderFactory.GetCardReader(card);
-        images.Add(cardReader.GetCardDescription());
+        SetUrlsList();
       }
       catch (Exception ex)
       {
         Console.WriteLine(ex.Message);
+        foreach (string url in _urlsList)
+        {
+          MemoryStream imageStream = GetMemoryStreamFromHostedImage(url);
+          Card card = new(imageStream);
+          CardReader cardReader = CardReaderFactory.GetCardReader(card);
+          images.Add(cardReader.GetCardDescription());
+          cardReader.GetCardDescription().Write($"{_directoryPath}{++a}{FILE_EXTENSION}");
+        }
         break;
       }
     }
@@ -53,22 +61,28 @@ class Program
   /// Gets a MemoryStream from an image hosted online.
   /// </summary>
   /// <returns>The MemoryStream of the image.</returns>
-  private static MemoryStream GetMemoryStreamFromHostedImage()
+  private static void SetUrlsList()
+  {
+    if (!IsValidUrl())
+    {
+      TryQuestUrls();
+    }
+    if (IsQuestUrl())
+    {
+      Console.WriteLine(_url);
+      _urlsList.Add(_url);
+      TryQuestUrls();
+    }
+    Console.WriteLine(_url);
+    _urlsList.Add(_url);
+    _url = GetUrlWithNewCardNumber(++_cardNumber);
+  }
+
+  private static MemoryStream GetMemoryStreamFromHostedImage(string url)
   {
     using (HttpClient httpClient = new())
     {
-      if (!IsValidUrl())
-      {
-        TryQuestUrls();
-      }
-      if (IsQuestUrl())
-      {
-        Console.WriteLine(_url);
-        TryQuestUrls();
-      }
-      Console.WriteLine(_url);
-      byte[] responseInBytes = httpClient.GetByteArrayAsync(_url).Result;
-      _url = GetUrlWithNewCardNumber(++_cardNumber);
+      byte[] responseInBytes = httpClient.GetByteArrayAsync(url).Result;
       return new MemoryStream(responseInBytes);
     }
   }
@@ -98,7 +112,7 @@ class Program
   /// </summary>
   /// <returns></returns>
   /// <exception cref="Exception"></exception>
-  private static MemoryStream TryQuestUrls()
+  private static void TryQuestUrls()
   {
     if (!_url.Contains("A.jpg")
       && !_url.Contains("B.jpg")
@@ -109,22 +123,22 @@ class Program
       {
         throw new Exception("No more files to parse.");
       }
-      return GetMemoryStreamFromHostedImage();
+      SetUrlsList();
     }
     else if (_url.Contains("A.jpg"))
     {
       _url = GetQuestUrl('B');
-      return GetMemoryStreamFromHostedImage();
+      SetUrlsList();
     }
     else if (_url.Contains("B.jpg"))
     {
       _url = GetQuestUrl('C');
-      return GetMemoryStreamFromHostedImage();
+      SetUrlsList();
     }
     else
     {
       _url = GetUrlWithNewCardNumber(++_cardNumber);
-      return GetMemoryStreamFromHostedImage();
+      SetUrlsList();
     }
   }
 
