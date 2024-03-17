@@ -1,4 +1,5 @@
-﻿using LOTR_CR.CardReaders;
+﻿using ImageMagick;
+using LOTR_CR.CardReaders;
 using LOTR_CR.CardReaders.Models;
 
 namespace LOTR_CR.CardReaders
@@ -7,7 +8,7 @@ namespace LOTR_CR.CardReaders
   {
     public LocationCardReader(Card card) : base(card) { }
 
-    public override void GetCardTitle()
+    public override MagickImage GetCardTitle()
     {
       throw new NotImplementedException();
     }

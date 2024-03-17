@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using ImageMagick;
 using LOTR_CR;
 using LOTR_CR.CardReaders;
@@ -16,10 +17,20 @@ class Program
 
   static void Main(string[] args)
   {
-    List<MagickImage> images = new();
+    List<MagickImage> images = [];
 
     Console.WriteLine("Welcome to the card reader of Lord of the Rings: the Card Game");
-    _url = BuildUrl(_cardNumber);
+
+    // DEBUG
+    _url = BuildUrl();
+    _url = GetUrlWithNewCardNumber(12);
+    MemoryStream stream = GetMemoryStreamFromHostedImage(_url);
+    Card cardTest = new(stream);
+    CardReader cardReaderTest = CardReaderFactory.GetCardReader(cardTest);
+    cardReaderTest.GetCardDescription();
+    // DEBUG
+
+    _url = BuildUrl();
     int a = 1;
     while (true)
     {
@@ -48,7 +59,7 @@ class Program
   /// </summary>
   /// <param name="cardNumber"></param>
   /// <returns></returns>
-  private static string BuildUrl(short cardNumber)
+  private static string BuildUrl()
   {
     StringBuilder stringBuilder = new StringBuilder(BASE_LINK);
     stringBuilder.Append(COLLECTION_NUMBER);
@@ -161,7 +172,7 @@ class Program
   /// <returns></returns>
   private static string GetUrlWithNewCardNumber(short cardNumber)
   {
-    string newFilename = $"{_cardNumber}{FILE_EXTENSION}";
+    string newFilename = $"{cardNumber}{FILE_EXTENSION}";
     string directoryPath = _url[..(_url.LastIndexOf('/') + 1)];
     return directoryPath + newFilename;
   }

@@ -8,7 +8,7 @@ namespace LOTR_CR.CardReaders
   {
     public EventCardReader(Card card) : base(card) { }
 
-    public override void GetCardTitle()
+    public override MagickImage GetCardTitle()
     {
       throw new NotImplementedException();
     }
