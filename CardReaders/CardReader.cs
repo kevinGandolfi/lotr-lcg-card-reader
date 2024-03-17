@@ -14,7 +14,7 @@ namespace LOTR_CR.CardReaders
     /// <summary>
     /// Instance of a card.
     /// </summary>
-    public MagickImage? CardImage { get; set; } = card.CardImage;
+    public MagickImage CardImage { get; set; } = card.CardImage;
 
     #endregion PROPERTIES
 
@@ -25,7 +25,7 @@ namespace LOTR_CR.CardReaders
     /// <summary>
     /// Gets the card title of the card property.
     /// </summary>
-    public abstract void GetCardTitle();
+    public abstract MagickImage GetCardTitle();
 
     /// <summary>
     /// Gets the card description of the card property.
