@@ -3,13 +3,16 @@ using LOTR_CR.CardReaders.Models;
 
 namespace LOTR_CR.CardReaders
 {
-  public class EquipmentCardReader : CardReader
+  /// <summary>
+  /// Card reader for attachments.
+  /// </summary>
+  public class AttachmentCardReader : CardReader
   {
     /// <summary>
     /// Constructor.
     /// </summary>
     /// <param name="card"></param>
-    public EquipmentCardReader(Card card) : base(card) { }
+    public AttachmentCardReader(Card card) : base(card) { }
 
     public override MagickImage GetCardTitle()
     {
@@ -23,25 +26,22 @@ namespace LOTR_CR.CardReaders
         cardTitle.BackgroundColor = MagickColors.Transparent;
         cardTitle.Composite(mask, 0, 0, CompositeOperator.CopyAlpha);
         cardTitle.Format = MagickFormat.Png;
-        cardTitle.Write(@"..\..\..\title.png");//DEBUG
+        //cardTitle.Write(@"..\..\..\title.png");//DEBUG
         return cardTitle;
       }
     }
 
-    public override MagickImage GetCardDescription()
+    public override MagickImage GetCardDescription(int height)
     {
-      MagickImage cardDescription = base.GetCardDescription();
+      height = 275;
+      MagickImage cardDescription = base.GetCardDescription(height);
       cardDescription.Format = MagickFormat.Png;
       MagickImage cardTitle = this.GetCardTitle();
-      int resultWidth = Math.Max(cardDescription.Width, cardTitle.Width);
-      int resultHeight = cardDescription.Height + cardTitle.Height;
-      MagickImage resultImage = new MagickImage(MagickColors.Transparent, resultWidth, resultHeight);
-      int posX = (cardDescription.Width - cardTitle.Width) / 2;
+      int posX = (cardDescription.Width - cardTitle.Width) / 2 - 17;
       int posY = 0;
-      resultImage.Composite(cardTitle, posX, posY, CompositeOperator.Over);
-      resultImage.Composite(cardDescription, 0, cardTitle.Height, CompositeOperator.Over);
-      //resultImage.Write(@"..\..\..\description.png");
-      return resultImage;
+      cardDescription.Composite(cardTitle, posX, posY, CompositeOperator.Over);
+      //cardDescription.Write(@"..\..\..\result.png"); // DEBUG
+      return cardDescription;
     }
   }
 }

@@ -18,8 +18,6 @@ namespace LOTR_CR.CardReaders
 
     #endregion PROPERTIES
 
-    private MagickImage? _cardTitle;
-
     #region PUBLIC METHODS
 
     /// <summary>
@@ -30,11 +28,10 @@ namespace LOTR_CR.CardReaders
     /// <summary>
     /// Gets the card description of the card property.
     /// </summary>
-    public virtual MagickImage GetCardDescription()
+    public virtual MagickImage GetCardDescription(int height = 235)
     {
-      // 324 - 559 px
       MagickImage cardDescription = (MagickImage)card.CardImage.Clone();
-      cardDescription.Crop(0, 235, ImageMagick.Gravity.South);
+      cardDescription.Crop(0, height, ImageMagick.Gravity.South);
       return cardDescription;
     }
 

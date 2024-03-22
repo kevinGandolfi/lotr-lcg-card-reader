@@ -60,6 +60,12 @@ namespace LOTR_CR.CardReaders.Models
       this.GetCardType();
     }
 
+    ~Card()
+    {
+      this.CardImage.Dispose();
+      this._bottom_label.Dispose();
+    }
+
     #region PRIVATE METHODS
 
     /// <summary>
@@ -107,7 +113,7 @@ namespace LOTR_CR.CardReaders.Models
         case string s when s.Contains("évén") || s.Contains("évèn") || s.Contains("èvén"):
           this.Type = CardType.Event;
           break;
-        case string s when s.Contains("attachemen") || s.Contains("ement") || s.Contains("at"):
+        case string s when s.Contains("attachemen") || s.Contains("hement") || s.Contains("at"):
           this.Type = CardType.Attachment;
           break;
         case string s when s.Contains("tré") || s.Contains("sor") || s == "tresor":
@@ -116,7 +122,7 @@ namespace LOTR_CR.CardReaders.Models
         case string s when s.Contains("li"):
           this.Type = CardType.Location;
           break;
-        case string s when s.Contains("tris") || s.Contains("î") || s.Contains("ise") || s.Contains("aî") || s.Contains("iraï"):
+        case string s when s.Contains("tris") || s.Contains('î') || s.Contains("ise") || s.Contains("aî") || s.Contains("iraï"):
           this.Type = CardType.Treachery;
           break;
         case string s when s.Contains("nnemi") || s.Contains("rameur") || s.Contains("nuinus") || s.Contains("nne") || s.Contains("nn"):
@@ -136,7 +142,7 @@ namespace LOTR_CR.CardReaders.Models
       this._bottom_label.Crop(0, 43, Gravity.South);
       this._bottom_label.Extent(this._bottom_label.Width, this._bottom_label.Height - 25, Gravity.North);
       this._bottom_label.Extent(140, this._bottom_label.Height, Gravity.Center);
-      this._bottom_label.Write(_BOTTOM_LABEL_FILE_NAME);
+      this._bottom_label.Write(_BOTTOM_LABEL_FILE_NAME); // DEBUG
     }
 
     /// <summary>
