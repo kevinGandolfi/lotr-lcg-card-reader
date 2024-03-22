@@ -10,6 +10,7 @@ class Program
   private const string BASE_LINK = "https://sda-src.cgbuilder.fr/images/carte/";
   private const string COLLECTION_NUMBER = "43/";
   private const string FILE_EXTENSION = ".jpg";
+  private const string FILE_EXTENSION_OUTPUT = ".png";
   private static short _cardNumber = 1;
   private static string _url = string.Empty;
   private static string _directoryPath = @"..\..\..\CardDescriptions\";
@@ -21,14 +22,14 @@ class Program
 
     Console.WriteLine("Welcome to the card reader of Lord of the Rings: the Card Game");
 
-    // DEBUG
+    //DEBUG
     _url = BuildUrl();
-    _url = GetUrlWithNewCardNumber(12);
+    _url = GetUrlWithNewCardNumber(20);
     MemoryStream stream = GetMemoryStreamFromHostedImage(_url);
     Card cardTest = new(stream);
     CardReader cardReaderTest = CardReaderFactory.GetCardReader(cardTest);
     cardReaderTest.GetCardDescription();
-    // DEBUG
+    //DEBUG
 
     _url = BuildUrl();
     int a = 1;
@@ -47,7 +48,7 @@ class Program
           Card card = new(imageStream);
           CardReader cardReader = CardReaderFactory.GetCardReader(card);
           images.Add(cardReader.GetCardDescription());
-          cardReader.GetCardDescription().Write($"{_directoryPath}{++a}{FILE_EXTENSION}");
+          cardReader.GetCardDescription().Write($"{_directoryPath}{++a}{FILE_EXTENSION_OUTPUT}");
         }
         break;
       }
@@ -126,8 +127,7 @@ class Program
   private static void TryQuestUrls()
   {
     if (!_url.Contains("A.jpg")
-      && !_url.Contains("B.jpg")
-      && !_url.Contains("C.jpg"))
+      && !_url.Contains("B.jpg"))
     {
       _url = GetQuestUrl('A');
       if (!IsValidUrl())
@@ -142,11 +142,6 @@ class Program
       SetUrlsList();
     }
     else if (_url.Contains("B.jpg"))
-    {
-      _url = GetQuestUrl('C');
-      SetUrlsList();
-    }
-    else
     {
       _url = GetUrlWithNewCardNumber(++_cardNumber);
       SetUrlsList();
