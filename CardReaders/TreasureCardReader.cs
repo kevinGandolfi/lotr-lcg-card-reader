@@ -26,7 +26,6 @@ namespace LOTR_CR.CardReaders
         cardTitle.BackgroundColor = MagickColors.Transparent;
         cardTitle.Composite(mask, 0, 0, CompositeOperator.CopyAlpha);
         cardTitle.Format = MagickFormat.Png;
-        cardTitle.Write(@"..\..\..\title.png");//DEBUG
         return cardTitle;
       }
     }
@@ -37,10 +36,9 @@ namespace LOTR_CR.CardReaders
       MagickImage cardDescription = base.GetCardDescription(height);
       cardDescription.Format = MagickFormat.Png;
       MagickImage cardTitle = this.GetCardTitle();
-      int posX = (cardDescription.Width - cardTitle.Width) / 2;
+      int posX = (cardDescription.Width - cardTitle.Width) / 2 + 8;
       int posY = 0;
       cardDescription.Composite(cardTitle, posX, posY, CompositeOperator.Over);
-      cardDescription.Write(@"..\..\..\result.png"); // DEBUG
       return cardDescription;
     }
   }

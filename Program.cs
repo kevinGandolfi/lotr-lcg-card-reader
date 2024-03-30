@@ -23,12 +23,13 @@ class Program
     Console.WriteLine("Welcome to the card reader of Lord of the Rings: the Card Game");
 
     //DEBUG
-    _url = BuildUrl();
-    _url = GetUrlWithNewCardNumber(20);
-    MemoryStream stream = GetMemoryStreamFromHostedImage(_url);
-    Card cardTest = new(stream);
-    CardReader cardReaderTest = CardReaderFactory.GetCardReader(cardTest);
-    cardReaderTest.GetCardDescription();
+    //_url = BuildUrl();
+    //_url = GetUrlWithNewCardNumber(18);//18 Event
+    //MemoryStream stream = GetMemoryStreamFromHostedImage(_url);
+    //Card cardTest = new(stream);
+    //CardReader cardReaderTest = CardReaderFactory.GetCardReader(cardTest);
+    //cardReaderTest.GetCardDescription().Write(@"..\..\..\result.png");
+
     //DEBUG
 
     _url = BuildUrl();

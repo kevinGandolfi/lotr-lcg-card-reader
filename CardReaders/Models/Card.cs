@@ -50,9 +50,9 @@ namespace LOTR_CR.CardReaders.Models
     #endregion PROPERTIES
 
     /// <summary>
-    /// Constructor that loads a picture hosted online.
+    /// Constructor that loads a picture.
     /// </summary>
-    /// <param name="imageUrl"></param>
+    /// <param name="imageStream"></param>
     public Card(MemoryStream imageStream)
     {
       this.Load(imageStream);
@@ -91,14 +91,16 @@ namespace LOTR_CR.CardReaders.Models
         return;
       }
 
-      if (this.IsObjectiveCard())
-      {
-        this.GetBottomLabelOfObjectiveCard();
-      }
-      else
-      {
-        this.GetBottomLabel();
-      }
+      //if (this.IsObjectiveCard())
+      //{
+      //  this.GetBottomLabelOfObjectiveCard();
+      //}
+      //else
+      //{
+      //  this.GetBottomLabel();
+      //}
+      this.GetBottomLabel();
+
       string labelText = this.GetLabelText();
       labelText = this.ExtractLetters(labelText);
 
@@ -110,7 +112,7 @@ namespace LOTR_CR.CardReaders.Models
         case string s when s.Contains("lie") || s.Contains("all"):
           this.Type = CardType.Ally;
           break;
-        case string s when s.Contains("évén") || s.Contains("évèn") || s.Contains("èvén"):
+        case string s when s.Contains("évén") || s.Contains("évèn") || s.Contains("èvén") || s.Contains("evenement"):
           this.Type = CardType.Event;
           break;
         case string s when s.Contains("attachemen") || s.Contains("hement") || s.Contains("at"):
