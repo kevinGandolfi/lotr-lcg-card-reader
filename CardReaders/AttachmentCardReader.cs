@@ -20,14 +20,12 @@ namespace LOTR_CR.CardReaders
       MagickGeometry titleGeometry = new(85, 17, 268, 40);
       cardTitle.Crop(titleGeometry);
 
-      using (MagickImage mask = new(MagickColors.Transparent, cardTitle.Width, cardTitle.Height))
-      {
-        mask.Draw(new DrawableRoundRectangle(0, 0, mask.Width - 1, mask.Height - 1, 10, 10));
-        cardTitle.BackgroundColor = MagickColors.Transparent;
-        cardTitle.Composite(mask, 0, 0, CompositeOperator.CopyAlpha);
-        cardTitle.Format = MagickFormat.Png;
-        return cardTitle;
-      }
+      using MagickImage mask = new(MagickColors.Transparent, cardTitle.Width, cardTitle.Height);
+      mask.Draw(new DrawableRoundRectangle(0, 0, mask.Width - 1, mask.Height - 1, 10, 10));
+      cardTitle.BackgroundColor = MagickColors.Transparent;
+      cardTitle.Composite(mask, 0, 0, CompositeOperator.CopyAlpha);
+      cardTitle.Format = MagickFormat.Png;
+      return cardTitle;
     }
 
     public override MagickImage GetCardDescription(int height)

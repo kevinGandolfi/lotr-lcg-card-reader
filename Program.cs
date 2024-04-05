@@ -23,12 +23,12 @@ class Program
     Console.WriteLine("Welcome to the card reader of Lord of the Rings: the Card Game");
 
     //DEBUG
-    //_url = BuildUrl();
-    //_url = GetUrlWithNewCardNumber(18);//18 Event
-    //MemoryStream stream = GetMemoryStreamFromHostedImage(_url);
-    //Card cardTest = new(stream);
-    //CardReader cardReaderTest = CardReaderFactory.GetCardReader(cardTest);
-    //cardReaderTest.GetCardDescription().Write(@"..\..\..\result.png");
+    _url = BuildUrl();
+    _url = GetUrlWithNewCardNumber(70);//18 Event, 13 Attachment, 63 Enemy, 70 Treachery
+    MemoryStream stream = GetMemoryStreamFromHostedImage(_url);
+    Card cardTest = new(stream);
+    CardReader cardReaderTest = CardReaderFactory.GetCardReader(cardTest);
+    cardReaderTest.GetCardDescription().Write(@"..\..\..\result.png");
 
     //DEBUG
 
@@ -106,17 +106,15 @@ class Program
   /// <returns></returns>
   private static bool IsValidUrl()
   {
-    using (HttpClient httpClient = new())
+    using HttpClient httpClient = new();
+    HttpResponseMessage response = httpClient.GetAsync(_url).Result;
+    if (response.IsSuccessStatusCode)
     {
-      HttpResponseMessage response = httpClient.GetAsync(_url).Result;
-      if (response.IsSuccessStatusCode)
-      {
-        return (response.RequestMessage.RequestUri?.ToString() == _url);
-      }
-      else
-      {
+        return response.RequestMessage!.RequestUri?.ToString() == _url;
+    }
+    else
+    {
         return false;
-      }
     }
   }
 
@@ -179,8 +177,8 @@ class Program
   /// <returns></returns>
   private static bool IsQuestUrl()
   {
-    return (_url.Contains($"A{FILE_EXTENSION}")
+    return _url.Contains($"A{FILE_EXTENSION}")
       || _url.Contains($"B{FILE_EXTENSION}")
-      || _url.Contains($"C{FILE_EXTENSION}"));
+      || _url.Contains($"C{FILE_EXTENSION}");
   }
 }
