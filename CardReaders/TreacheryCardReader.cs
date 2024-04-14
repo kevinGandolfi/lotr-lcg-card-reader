@@ -27,7 +27,6 @@ public class TreacheryCardReader : CardReader
 
     public override MagickImage GetCardDescription(int height)
     {
-      this.GetCardTitle().Write(@"..\..\..\title.png");
       height = 290;
       MagickImage cardDescription = base.GetCardDescription(height);
       cardDescription.Format = MagickFormat.Png;

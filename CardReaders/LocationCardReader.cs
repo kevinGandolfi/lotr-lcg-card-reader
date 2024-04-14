@@ -10,7 +10,28 @@ namespace LOTR_CR.CardReaders
 
     public override MagickImage GetCardTitle()
     {
-      throw new NotImplementedException();
+      MagickImage cardTitle = (MagickImage)this.CardImage.Clone();
+      MagickGeometry titleGeometry = new(90, 24, 212, 30);
+      cardTitle.Crop(titleGeometry);
+
+      using MagickImage mask = new(MagickColors.Transparent, cardTitle.Width, cardTitle.Height);
+      mask.Draw(new DrawableRoundRectangle(0, 0, mask.Width - 1, mask.Height - 1, 10, 10));
+      cardTitle.BackgroundColor = MagickColors.Transparent;
+      cardTitle.Composite(mask, 0, 0, CompositeOperator.CopyAlpha);
+      cardTitle.Format = MagickFormat.Png;
+      return cardTitle;
+    }
+
+    public override MagickImage GetCardDescription(int height)
+    {
+      height = 269;
+      MagickImage cardDescription = base.GetCardDescription(height);
+      cardDescription.Format = MagickFormat.Png;
+      MagickImage cardTitle = this.GetCardTitle();
+      int posX = (cardDescription.Width - cardTitle.Width) / 2;
+      int posY = 0;
+      cardDescription.Composite(cardTitle, posX, posY, CompositeOperator.Over);
+      return cardDescription;
     }
   }
 }

@@ -23,12 +23,13 @@ class Program
     Console.WriteLine("Welcome to the card reader of Lord of the Rings: the Card Game");
 
     //DEBUG
-    _url = BuildUrl();
-    _url = GetUrlWithNewCardNumber(70);//18 Event, 13 Attachment, 63 Enemy, 70 Treachery
-    MemoryStream stream = GetMemoryStreamFromHostedImage(_url);
-    Card cardTest = new(stream);
-    CardReader cardReaderTest = CardReaderFactory.GetCardReader(cardTest);
-    cardReaderTest.GetCardDescription().Write(@"..\..\..\result.png");
+
+    // _url = BuildUrl();
+    // _url = GetUrlWithNewCardNumber("29A");//18 Event, 13 Attachment, 63 Enemy, 70 Treachery, 50 objective, 40 location, 29A quest
+    // MemoryStream stream = GetMemoryStreamFromHostedImage(_url);
+    // Card cardTest = new(stream);
+    // CardReader cardReaderTest = CardReaderFactory.GetCardReader(cardTest);
+    // cardReaderTest.GetCardDescription().Write(@"..\..\..\result.png");
 
     //DEBUG
 
@@ -88,7 +89,8 @@ class Program
     }
     Console.WriteLine(_url);
     _urlsList.Add(_url);
-    _url = GetUrlWithNewCardNumber(++_cardNumber);
+    ++_cardNumber;
+    _url = GetUrlWithNewCardNumber(_cardNumber.ToString());
   }
 
   private static MemoryStream GetMemoryStreamFromHostedImage(string url)
@@ -142,7 +144,8 @@ class Program
     }
     else if (_url.Contains("B.jpg"))
     {
-      _url = GetUrlWithNewCardNumber(++_cardNumber);
+      ++_cardNumber;
+      _url = GetUrlWithNewCardNumber(_cardNumber.ToString());
       SetUrlsList();
     }
   }
@@ -164,7 +167,7 @@ class Program
   /// </summary>
   /// <param name="cardNumber"></param>
   /// <returns></returns>
-  private static string GetUrlWithNewCardNumber(short cardNumber)
+  private static string GetUrlWithNewCardNumber(string cardNumber)
   {
     string newFilename = $"{cardNumber}{FILE_EXTENSION}";
     string directoryPath = _url[..(_url.LastIndexOf('/') + 1)];
