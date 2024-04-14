@@ -97,11 +97,11 @@ namespace LOTR_CR.CardReaders.Models
       this.Type = labelText switch
       {
         string s when s.First() == 'h' => CardType.Hero,
-        string s when s.Contains("lie") || s.Contains("all") => CardType.Ally,
-        string s when s.Contains("évén") || s.Contains("évèn") || s.Contains("èvén") || s.Contains("evenement") => CardType.Event,
+        string s when s.Contains("llie") || s.Contains("all") => CardType.Ally,
+        string s when s.Contains("évén") || s.Contains("évèn") || s.Contains("èvén") || s.Contains("èvè") || s.Contains("evenement") => CardType.Event,
         string s when s.Contains("attachemen") || s.Contains("hement") || s.Contains("at") => CardType.Attachment,
         string s when s.Contains("tré") || s.Contains("sor") || s == "tresor" => CardType.Treasure,
-        string s when s.Contains("li") => CardType.Location,
+        string s when s.Contains("lieu") || s.Contains("li€u") => CardType.Location,
         string s when s.Contains("tris") || s.Contains('î') || s.Contains("ise") || s.Contains("aî") || s.Contains("iraï") => CardType.Treachery,
         string s when s.Contains("nnemi") || s.Contains("rameur") || s.Contains("nuinus") || s.Contains("nne") || s.Contains("nn") => CardType.Enemy,
         _ => CardType.Objective,

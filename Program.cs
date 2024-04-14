@@ -25,7 +25,7 @@ class Program
     //DEBUG
 
     // _url = BuildUrl();
-    // _url = GetUrlWithNewCardNumber("29A");//18 Event, 13 Attachment, 63 Enemy, 70 Treachery, 50 objective, 40 location, 29A quest
+    // _url = GetUrlWithNewCardNumber("82");//18 Event, 13 Attachment, 63 Enemy, 70 Treachery, 50 objective, 40 location, 29A quest
     // MemoryStream stream = GetMemoryStreamFromHostedImage(_url);
     // Card cardTest = new(stream);
     // CardReader cardReaderTest = CardReaderFactory.GetCardReader(cardTest);
@@ -46,6 +46,7 @@ class Program
         Console.WriteLine(ex.Message);
         foreach (string url in _urlsList)
         {
+          Console.WriteLine(url);
           MemoryStream imageStream = GetMemoryStreamFromHostedImage(url);
           Card card = new(imageStream);
           CardReader cardReader = CardReaderFactory.GetCardReader(card);
@@ -83,11 +84,9 @@ class Program
     }
     if (IsQuestUrl())
     {
-      Console.WriteLine(_url);
       _urlsList.Add(_url);
       TryQuestUrls();
     }
-    Console.WriteLine(_url);
     _urlsList.Add(_url);
     ++_cardNumber;
     _url = GetUrlWithNewCardNumber(_cardNumber.ToString());
