@@ -11,7 +11,6 @@ public class ImageArranger
   private int _maxHeight = 0;
 
   public IEnumerable<MagickImage> imagesToPrint = [];
-  public List<PageToPrint> PagesToPrint { get; set; } = [];
 
   public ImageArranger()
   {
@@ -24,10 +23,20 @@ public class ImageArranger
   /// </summary>
   public void ArrangeOnPage()
   {
+    PageToPrint pageToPrint = new PageToPrint(this._maxWidth, this._maxHeight, MARGIN);
     foreach (MagickImage imageToPrint in imagesToPrint)
     {
-      this.PagesToPrint.Add(new PageToPrint(this._maxWidth, this._maxHeight, MARGIN));
+      while (ImageArranger.CanAddToPage(pageToPrint))
+      {
+        KeyValuePair<(int x, int y), bool> keyValuePair = pageToPrint.Positions.First(p => p.Value);
+        // Set to false current position
+      }
       //pageImage.Composite(imageToPrint, lastXPosition, lastYPosition, CompositeOperator.Over);
     }
+  }
+
+  private static bool CanAddToPage(PageToPrint pageToPrint)
+  {
+    return pageToPrint.Positions.Any(p => p.Value);
   }
 }

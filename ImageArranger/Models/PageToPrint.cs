@@ -13,11 +13,9 @@ namespace ImageArranger.Models
     public MagickImage PageImage = new (MagickColors.White, 2480, 3508);
 
     /// <summary>
-    /// List of positions for the images. The boolean value is set to false if the position is not taken, true otherwise.
+    /// List of positions for the images. The boolean value is set to true if the position is available, false otherwise.
     /// </summary>
     public Dictionary<(int x, int y), bool> Positions { get; set; } = [];
-
-    public bool IsFull { get; set; } = false;
 
     /// <summary>
     /// Constructor.
