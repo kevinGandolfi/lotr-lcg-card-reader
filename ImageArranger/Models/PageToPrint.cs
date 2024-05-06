@@ -9,7 +9,7 @@ namespace ImageArranger.Models
   {
     private const string FILE_EXTENSION_OUTPUT = ".png";
 
-    private const string _directoryPath = @"..\..\..\PagesToPrint\";
+    private const string _directoryPath = @"..\..\..\..\PagesToPrint\";
 
     #region PROPERTIES
 
@@ -38,9 +38,9 @@ namespace ImageArranger.Models
       this.PageImage = new(MagickColors.White, 2480, 3508);
       while (this.HasEnoughHeight(imageToPrintHeight, lastYPosition, margin))
       {
-        Positions.Add((lastXPosition, lastYPosition), false);
         if (this.HasEnoughWidth(imageToPrintWidth, lastXPosition, margin))
         {
+          this.Positions.Add((lastXPosition, lastYPosition), true);
           lastXPosition += imageToPrintWidth + margin;
         }
         else
@@ -88,12 +88,12 @@ namespace ImageArranger.Models
 
     private bool HasEnoughWidth(int imageToPrintWidth, int lastXPosition, int margin)
     {
-      return lastXPosition - this.PageImage.Width > imageToPrintWidth + margin;
+      return this.PageImage.Width - lastXPosition > imageToPrintWidth + margin;
     }
 
     private bool HasEnoughHeight(int imageToPrintHeight, int lastYPosition, int margin)
     {
-      return lastYPosition - this.PageImage.Width > imageToPrintHeight + margin;
+      return this.PageImage.Height - lastYPosition > imageToPrintHeight + margin;
     }
 
     #endregion PRIVATE METHODS
