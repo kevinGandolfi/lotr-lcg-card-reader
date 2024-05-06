@@ -1,5 +1,5 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
+using ImageArranger;
 using ImageMagick;
 using LOTR_CR;
 using LOTR_CR.CardReaders;
@@ -53,6 +53,9 @@ class Program
           images.Add(cardReader.GetCardDescription());
           cardReader.GetCardDescription().Write($"{_directoryPath}{++a}{FILE_EXTENSION_OUTPUT}");
         }
+        PageArranger imageArranger = new(images);
+        imageArranger.ArrangeOnPage();
+
         break;
       }
     }
@@ -65,7 +68,7 @@ class Program
   /// <returns></returns>
   private static string BuildUrl()
   {
-    StringBuilder stringBuilder = new StringBuilder(BASE_LINK);
+    StringBuilder stringBuilder = new (BASE_LINK);
     stringBuilder.Append(COLLECTION_NUMBER);
     stringBuilder.Append(_cardNumber);
     stringBuilder.Append(FILE_EXTENSION);
