@@ -60,6 +60,7 @@ public class PageArranger
         pageToPrint.AddToPage(imageToPrint);
       }
     }
+    pageToPrint.SavePageImage(pageNumber);
   }
 
   #endregion PUBLIC METHODS
