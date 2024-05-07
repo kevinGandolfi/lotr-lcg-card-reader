@@ -50,8 +50,13 @@ class Program
           MemoryStream imageStream = GetMemoryStreamFromHostedImage(url);
           Card card = new(imageStream);
           CardReader cardReader = CardReaderFactory.GetCardReader(card);
-          images.Add(cardReader.GetCardDescription());
-          cardReader.GetCardDescription().Write($"{_directoryPath}{++a}{FILE_EXTENSION_OUTPUT}");
+          MagickImage image = cardReader.GetCardDescription();
+          image.AdaptiveResize((int)(image.Width * 1.905), (int)(image.Height * 1.843));
+          for (int i = 0; i < card.NumberOfCopies; i++)
+          {
+            images.Add(image);
+            cardReader.GetCardDescription().Write($"{_directoryPath}{++a}{FILE_EXTENSION_OUTPUT}");
+          }
         }
         PageArranger imageArranger = new(images);
         imageArranger.ArrangeOnPage();

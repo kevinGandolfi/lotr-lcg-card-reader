@@ -47,6 +47,8 @@ namespace LOTR_CR.CardReaders.Models
     /// </summary>
     public string Url { get; set; } = String.Empty;
 
+    public int NumberOfCopies { get; set; }
+
     #endregion PROPERTIES
 
     /// <summary>
@@ -58,6 +60,7 @@ namespace LOTR_CR.CardReaders.Models
       this.Load(imageStream);
       this._bottom_label = (MagickImage)this.CardImage.Clone();
       this.GetCardType();
+      this.GetNumberOfCopies();
     }
 
     ~Card()
@@ -105,6 +108,18 @@ namespace LOTR_CR.CardReaders.Models
         string s when s.Contains("tris") || s.Contains('î') || s.Contains("ise") || s.Contains("aî") || s.Contains("iraï") || s == "nuinusz,," => CardType.Treachery,
         string s when s.Contains("nnemi") || s.Contains("rameur") || s.Contains("nuinus") || s.Contains("nne") || s.Contains("nn") => CardType.Enemy,
         _ => CardType.Objective,
+      };
+    }
+
+    private void GetNumberOfCopies()
+    {
+      this.NumberOfCopies = this.Type switch
+      {
+        CardType.Hero => 1,
+        CardType.Ally => 3,
+        CardType.Event => 3,
+        CardType.Attachment => 3,
+        _ => 1
       };
     }
 
