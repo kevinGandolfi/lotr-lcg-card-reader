@@ -9,19 +9,17 @@ class Program
 {
   private const string BASE_LINK = "https://sda-src.cgbuilder.fr/images/carte/";
   private const string COLLECTION_NUMBER = "43/";
-  private const string FILE_EXTENSION = ".jpg";
+  private const string FILE_EXTENSION_INPUT = ".jpg";
   private const string FILE_EXTENSION_OUTPUT = ".png";
   private static short _cardNumber = 1;
-  private static string _url = string.Empty;
+
   private static string _directoryPath = @"..\..\..\CardDescriptions\";
+  private static string _imagesLocalFolder = @"..\..\..\..\ImagesToPrint\";
+  private static string _url = string.Empty;
   private static List<string> _urlsList = [];
 
   static void Main(string[] args)
   {
-    List<MagickImage> images = [];
-
-    Console.WriteLine("Welcome to the card reader of Lord of the Rings: the Card Game");
-
     //DEBUG
 
     // _url = BuildUrl();
@@ -33,35 +31,78 @@ class Program
 
     //DEBUG
 
-    _url = BuildUrl();
-    int a = 1;
+    List<MagickImage> images = [];
+
+    Console.WriteLine("Welcome to the card reader of Lord of the Rings: the Card Game");
+    Console.WriteLine("Select a mode: \n1 - Import from the website\n2 - Import from the local folder");
+    string? input = Console.ReadLine();
+    int mode;
     while (true)
     {
-      try
+      if (int.TryParse(input, out int modeinput))
       {
-        SetUrlsList();
+        mode = modeinput;
+        break;
       }
-      catch (Exception ex)
+      else
       {
-        Console.WriteLine(ex.Message);
-        foreach (string url in _urlsList)
+        continue;
+      }
+    }
+
+    if (mode == 1)
+    {
+
+      _url = BuildUrl();
+      int a = 1;
+      while (true)
+      {
+        try
         {
-          Console.WriteLine(url);
-          MemoryStream imageStream = GetMemoryStreamFromHostedImage(url);
-          Card card = new(imageStream);
-          CardReader cardReader = CardReaderFactory.GetCardReader(card);
-          MagickImage image = cardReader.GetCardDescription();
-          image.AdaptiveResize((int)(image.Width * 1.905), (int)(image.Height * 1.843));
-          for (int i = 0; i < card.NumberOfCopies; i++)
-          {
-            images.Add(image);
-            cardReader.GetCardDescription().Write($"{_directoryPath}{++a}{FILE_EXTENSION_OUTPUT}");
-          }
+          SetUrlsList();
         }
+        catch (Exception ex)
+        {
+          Console.WriteLine(ex.Message);
+          foreach (string url in _urlsList)
+          {
+            Console.WriteLine(url);
+            MemoryStream imageStream = GetMemoryStreamFromHostedImage(url);
+            Card card = new(imageStream);
+            CardReader cardReader = CardReaderFactory.GetCardReader(card);
+            MagickImage image = cardReader.GetCardDescription();
+            image.AdaptiveResize((int)(image.Width * 1.905), (int)(image.Height * 1.843));
+            for (int i = 0; i < card.NumberOfCopies; i++)
+            {
+              images.Add(image);
+              cardReader.GetCardDescription().Write($"{_directoryPath}{++a}{FILE_EXTENSION_OUTPUT}");
+            }
+          }
+          PageArranger imageArranger = new(images);
+          imageArranger.ArrangeOnPage();
+
+          break;
+        }
+      }
+    }
+    else if (mode == 2)
+    {
+      if (Directory.Exists(_imagesLocalFolder))
+      {
+        string[] imagePaths = Directory.GetFiles(_imagesLocalFolder, "*.png");
+        foreach (string imagePath in imagePaths)
+        {
+          MagickImage image = new(imagePath);
+          image.AdaptiveResize((int)(image.Width * 1.905), (int)(image.Height * 1.843));
+          images.Add(image);
+        }
+
         PageArranger imageArranger = new(images);
         imageArranger.ArrangeOnPage();
-
-        break;
+      }
+      else
+      {
+        Console.WriteLine("Folder not found.");
       }
     }
   }
@@ -73,10 +114,10 @@ class Program
   /// <returns></returns>
   private static string BuildUrl()
   {
-    StringBuilder stringBuilder = new (BASE_LINK);
+    StringBuilder stringBuilder = new(BASE_LINK);
     stringBuilder.Append(COLLECTION_NUMBER);
     stringBuilder.Append(_cardNumber);
-    stringBuilder.Append(FILE_EXTENSION);
+    stringBuilder.Append(FILE_EXTENSION_INPUT);
     return stringBuilder.ToString();
   }
 
@@ -119,11 +160,11 @@ class Program
     HttpResponseMessage response = httpClient.GetAsync(_url).Result;
     if (response.IsSuccessStatusCode)
     {
-        return response.RequestMessage!.RequestUri?.ToString() == _url;
+      return response.RequestMessage!.RequestUri?.ToString() == _url;
     }
     else
     {
-        return false;
+      return false;
     }
   }
 
@@ -164,7 +205,7 @@ class Program
   /// <returns></returns>
   private static string GetQuestUrl(char newLetter)
   {
-    string newFilename = $"{_cardNumber}{newLetter}{FILE_EXTENSION}";
+    string newFilename = $"{_cardNumber}{newLetter}{FILE_EXTENSION_INPUT}";
     string directoryPath = _url[..(_url.LastIndexOf('/') + 1)];
     return directoryPath + newFilename;
   }
@@ -176,7 +217,7 @@ class Program
   /// <returns></returns>
   private static string GetUrlWithNewCardNumber(string cardNumber)
   {
-    string newFilename = $"{cardNumber}{FILE_EXTENSION}";
+    string newFilename = $"{cardNumber}{FILE_EXTENSION_INPUT}";
     string directoryPath = _url[..(_url.LastIndexOf('/') + 1)];
     return directoryPath + newFilename;
   }
@@ -187,8 +228,8 @@ class Program
   /// <returns></returns>
   private static bool IsQuestUrl()
   {
-    return _url.Contains($"A{FILE_EXTENSION}")
-      || _url.Contains($"B{FILE_EXTENSION}")
-      || _url.Contains($"C{FILE_EXTENSION}");
+    return _url.Contains($"A{FILE_EXTENSION_INPUT}")
+      || _url.Contains($"B{FILE_EXTENSION_INPUT}")
+      || _url.Contains($"C{FILE_EXTENSION_INPUT}");
   }
 }

@@ -10,7 +10,7 @@ public class PageArranger
 {
   #region CONSTANTS
 
-  private const int MARGIN = 10;
+  private const int MARGIN = 30;
 
   #endregion CONSTANTS
 

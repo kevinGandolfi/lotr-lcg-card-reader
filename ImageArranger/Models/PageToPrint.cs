@@ -8,7 +8,6 @@ namespace ImageArranger.Models
   public class PageToPrint
   {
     private const string FILE_EXTENSION_OUTPUT = ".png";
-
     private const string _directoryPath = @"..\..\..\..\PagesToPrint\";
 
     #region PROPERTIES
