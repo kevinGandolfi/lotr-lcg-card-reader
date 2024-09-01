@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 using ImageArranger;
 using ImageMagick;
 using LOTR_CR;
@@ -69,6 +70,29 @@ class Program
             Console.WriteLine(url);
             MemoryStream imageStream = GetMemoryStreamFromHostedImage(url);
             Card card = new(imageStream);
+            string regExFileNameNoExtension = @"(\d+).jpg";
+            Match match = Regex.Match(url, regExFileNameNoExtension);
+            int cardNumber = 0;
+            int collectionNumber = 0;
+            if (match.Success)
+            {
+              string fileNameWithoutExtension = match.Groups[1].Value;
+              if (int.TryParse(fileNameWithoutExtension, out int fileNumber))
+              {
+                cardNumber = fileNumber;
+              }
+              if (int.TryParse(COLLECTION_NUMBER, out int result))
+              {
+                collectionNumber = result;
+              }
+            }
+            if (card.Type == CardType.Enemy
+              || card.Type == CardType.Treachery
+              || card.Type == CardType.Location
+              || card.Type == CardType.Objective)
+            {
+              card.NumberOfCopies = EncounterCardNumbers.NumbersPerCollection[(collectionNumber, cardNumber)];
+            }
             CardReader cardReader = CardReaderFactory.GetCardReader(card);
             MagickImage image = cardReader.GetCardDescription();
             image.AdaptiveResize((int)(image.Width * 1.905), (int)(image.Height * 1.843));
