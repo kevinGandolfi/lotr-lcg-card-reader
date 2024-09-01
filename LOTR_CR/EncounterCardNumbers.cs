@@ -65,7 +65,7 @@ public static class EncounterCardNumbers
     { (19, 104), 2 },
     { (19, 105), 2 },
     { (19, 106), 2 },
-    // Le Sang) du Gondor
+    // Le Sang du Gondor
     { (20, 119), 1 },
     { (20, 120), 4 },
     { (20, 121), 3 },
@@ -81,7 +81,7 @@ public static class EncounterCardNumbers
     { (20, 131), 2 },
     { (20, 132), 1 },
     { (20, 133), 1 },
-    // La Vall)ée de Morgul
+    // La Vallée de Morgul
     { (21, 147), 1 },
     { (21, 148), 3 },
     { (21, 149), 2 },
@@ -101,6 +101,7 @@ public static class EncounterCardNumbers
     { (43, 33), 1 },
     { (43, 34), 1 },
     { (43, 35), 3 },
+    { (43, 36), 3 },
     { (43, 37), 1 },
     { (43, 38), 2 },
     { (43, 39), 2 },
@@ -149,7 +150,7 @@ public static class EncounterCardNumbers
     { (43, 82), 2 },
     { (43, 83), 2 },
     { (43, 84), 1 },
-    // Au Seu)il de la Porte
+    // Au Seuil de la Porte
     { (44, 25), 1 },
     { (44, 26), 4 },
     { (44, 27), 2 },

@@ -10,6 +10,7 @@ class Program
 {
   private const string BASE_LINK = "https://sda-src.cgbuilder.fr/images/carte/";
   private const string COLLECTION_NUMBER = "43/";
+  private const int COLLECTION_NUMBER_INT = 43;
   private const string FILE_EXTENSION_INPUT = ".jpg";
   private const string FILE_EXTENSION_OUTPUT = ".png";
   private static short _cardNumber = 1;
@@ -73,7 +74,6 @@ class Program
             string regExFileNameNoExtension = @"(\d+).jpg";
             Match match = Regex.Match(url, regExFileNameNoExtension);
             int cardNumber = 0;
-            int collectionNumber = 0;
             if (match.Success)
             {
               string fileNameWithoutExtension = match.Groups[1].Value;
@@ -81,17 +81,13 @@ class Program
               {
                 cardNumber = fileNumber;
               }
-              if (int.TryParse(COLLECTION_NUMBER, out int result))
-              {
-                collectionNumber = result;
-              }
             }
             if (card.Type == CardType.Enemy
               || card.Type == CardType.Treachery
               || card.Type == CardType.Location
               || card.Type == CardType.Objective)
             {
-              card.NumberOfCopies = EncounterCardNumbers.NumbersPerCollection[(collectionNumber, cardNumber)];
+              card.NumberOfCopies = EncounterCardNumbers.NumbersPerCollection[(COLLECTION_NUMBER_INT, cardNumber)];
             }
             CardReader cardReader = CardReaderFactory.GetCardReader(card);
             MagickImage image = cardReader.GetCardDescription();
