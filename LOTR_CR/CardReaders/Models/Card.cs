@@ -13,9 +13,9 @@ namespace LOTR_CR.CardReaders.Models
     #region CONSTANTS
 
     private const string _COLOR_SPECIFIC_TO_OBJECTIVE_CARDS = "#898F8F";
-    private const string _BOTTOM_LABEL_FILE_NAME = @"..\..\..\bottom_label.jpg";
+    private const string _BOTTOM_LABEL_FILE_NAME = @"..\..\..\bottom_label.png";
     private const string _TESSDATA_LOCATION = @"..\..\..\tessdata";
-    private const string _LANGUAGE = "fra";
+    private const string _LANGUAGE = "sda-jce";
 
     #endregion CONSTANTS
 
@@ -99,14 +99,55 @@ namespace LOTR_CR.CardReaders.Models
       labelText = this.ExtractLetters(labelText);
       this.Type = labelText switch
       {
-        string s when s.First() == 'h' => CardType.Hero,
-        string s when s.Contains("llie") || s.Contains("all") => CardType.Ally,
-        string s when s.Contains("évén") || s.Contains("évèn") || s.Contains("èvén") || s.Contains("èvè") || s.Contains("evenement") => CardType.Event,
-        string s when s.Contains("attachemen") || s.Contains("hement") || s.Contains("at") => CardType.Attachment,
-        string s when s.Contains("tré") || s.Contains("sor") || s == "tresor" => CardType.Treasure,
-        string s when s.Contains("lieu") || s.Contains("li€u") => CardType.Location,
-        string s when s.Contains("tris") || s.Contains('î') || s.Contains("ise") || s.Contains("aî") || s.Contains("iraï") || s == "nuinusz,," => CardType.Treachery,
-        string s when s.Contains("nnemi") || s.Contains("rameur") || s.Contains("nuinus") || s.Contains("nne") || s.Contains("nn") => CardType.Enemy,
+        string s when s.First() == 'h' 
+          || s.Contains("héros") 
+          || s.Contains("heros") 
+          => CardType.Hero,
+        string s when s.Contains("lie") 
+          || s.Contains("all") 
+          || s.Contains("aisss")
+          || s.Contains("li")
+          => CardType.Ally,
+        string s when s.Contains("évén") 
+          || s.Contains("evé") 
+          || s.Contains("évèn") 
+          || s.Contains("èvén") 
+          || s.Contains("èvè") 
+          || s.Contains("eve")
+          || s.Contains("even")
+          || s.Contains("£v£")
+          || s.Contains("ëv")
+          => CardType.Event,
+        string s when s.Contains("attachemen") 
+          || s.Contains("hement") 
+          || s.Contains("at") 
+          || s.Contains("tach")
+          || s.Contains("nucueucur")
+          || s.Contains("ﬁaﬂacueneur")
+          || s.Contains("aha")
+          => CardType.Attachment,
+        string s when s.Contains("tré") 
+          || s.Contains("sor") 
+          || s.Contains("vnésok")
+          || s.Contains("ïrîïsäà")
+          || s == "tresor" 
+          => CardType.Treasure,
+        string s when s.Contains("lieu") 
+          || s.Contains("li€u") 
+          => CardType.Location,
+        string s when s.Contains("tris") 
+          || s.Contains('î') 
+          || s.Contains("ise") 
+          || s.Contains("aî") 
+          || s.Contains("iraï") 
+          || s == "nuinusz,," 
+          => CardType.Treachery,
+        string s when s.Contains("nnemi") 
+          || s.Contains("rameur") 
+          || s.Contains("nuinus") 
+          || s.Contains("nne") 
+          || s.Contains("nn") 
+          => CardType.Enemy,
         _ => CardType.Objective,
       };
     }
@@ -184,8 +225,7 @@ namespace LOTR_CR.CardReaders.Models
     private string GetLabelText()
     {
       string labelText = string.Empty;
-
-      using (var engine = new TesseractEngine(Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _TESSDATA_LOCATION)), _LANGUAGE, EngineMode.TesseractOnly))
+      using (var engine = new TesseractEngine(Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _TESSDATA_LOCATION)), _LANGUAGE, EngineMode.Default))
       {
         using (var img = Pix.LoadFromFile(_BOTTOM_LABEL_FILE_NAME))
         {

@@ -21,6 +21,9 @@
     <None Update="tessdata\fra.traineddata">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+	<None Update="tessdata\sda-jce.traineddata">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</None>
   </ItemGroup>
 
 </Project>

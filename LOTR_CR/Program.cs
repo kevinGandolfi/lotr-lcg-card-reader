@@ -8,28 +8,28 @@ using LOTR_CR.CardReaders.Models;
 
 class Program
 {
-  private const string BASE_LINK = "https://sda-src.cgbuilder.fr/images/carte/";
-  private const string COLLECTION_NUMBER = "43/";
-  private const int COLLECTION_NUMBER_INT = 43;
-  private const string FILE_EXTENSION_INPUT = ".jpg";
-  private const string FILE_EXTENSION_OUTPUT = ".png";
-  private static short _cardNumber = 1;
+  private readonly static string BASE_LINK = "https://sda-src.cgbuilder.fr/images/carte/";
+  private readonly static string COLLECTION_NUMBER = "44/";
+  private readonly static int COLLECTION_NUMBER_INT = 44;
+  private readonly static string FILE_EXTENSION_INPUT = ".jpg";
+  private readonly static string FILE_EXTENSION_OUTPUT = ".png";
+  private readonly static string DIRECTORY_PATH = @"..\..\..\CardDescriptions\";
+  private readonly static string IMAGES_LOCAL_FOLDER = @"..\..\..\..\ImagesToPrint\";
 
-  private static string _directoryPath = @"..\..\..\CardDescriptions\";
-  private static string _imagesLocalFolder = @"..\..\..\..\ImagesToPrint\";
   private static string _url = string.Empty;
+  private static short _cardNumber = 1;
   private static List<string> _urlsList = [];
 
   static void Main(string[] args)
   {
     //DEBUG
 
-    // _url = BuildUrl();
-    // _url = GetUrlWithNewCardNumber("82");//18 Event, 13 Attachment, 63 Enemy, 70 Treachery, 50 objective, 40 location, 29A quest
-    // MemoryStream stream = GetMemoryStreamFromHostedImage(_url);
-    // Card cardTest = new(stream);
-    // CardReader cardReaderTest = CardReaderFactory.GetCardReader(cardTest);
-    // cardReaderTest.GetCardDescription().Write(@"..\..\..\result.png");
+    _url = BuildUrl();
+    _url = GetUrlWithNewCardNumber("1");
+    MemoryStream stream = GetMemoryStreamFromHostedImage(_url);
+    Card cardTest = new(stream);
+    CardReader cardReaderTest = CardReaderFactory.GetCardReader(cardTest);
+    cardReaderTest.GetCardDescription().Write(@"..\..\..\result.png");
 
     //DEBUG
 
@@ -54,7 +54,6 @@ class Program
 
     if (mode == 1)
     {
-
       _url = BuildUrl();
       int a = 1;
       while (true)
@@ -95,7 +94,7 @@ class Program
             for (int i = 0; i < card.NumberOfCopies; i++)
             {
               images.Add(image);
-              cardReader.GetCardDescription().Write($"{_directoryPath}{++a}{FILE_EXTENSION_OUTPUT}");
+              cardReader.GetCardDescription().Write($"{DIRECTORY_PATH}{++a}{FILE_EXTENSION_OUTPUT}");
             }
           }
           PageArranger imageArranger = new(images);
@@ -107,9 +106,9 @@ class Program
     }
     else if (mode == 2)
     {
-      if (Directory.Exists(_imagesLocalFolder))
+      if (Directory.Exists(IMAGES_LOCAL_FOLDER))
       {
-        string[] imagePaths = Directory.GetFiles(_imagesLocalFolder, "*.png");
+        string[] imagePaths = Directory.GetFiles(IMAGES_LOCAL_FOLDER, "*.png");
         foreach (string imagePath in imagePaths)
         {
           MagickImage image = new(imagePath);
