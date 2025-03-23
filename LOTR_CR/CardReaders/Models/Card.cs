@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Linq;
 using ImageMagick;
 using Tesseract;
 using static System.Net.Mime.MediaTypeNames;
@@ -69,6 +70,11 @@ namespace LOTR_CR.CardReaders.Models
       this._bottom_label.Dispose();
     }
 
+    public void WriteBottomLabel(int cardNumber)
+    {
+      this._bottom_label.Write($@"..\..\..\BottomLabels\{cardNumber}.png");
+    }
+
     #region PRIVATE METHODS
 
     /// <summary>
@@ -88,7 +94,7 @@ namespace LOTR_CR.CardReaders.Models
     /// </summary>
     private void GetCardType()
     {
-      if (this.CardImage.Width == 560 && this.CardImage.Height == 394)
+      if (this.CardImage.Width > this.CardImage.Height)
       {
         this.Type = CardType.Quest;
         return;
@@ -99,16 +105,13 @@ namespace LOTR_CR.CardReaders.Models
       labelText = this.ExtractLetters(labelText);
       this.Type = labelText switch
       {
-        string s when s.First() == 'h' 
-          || s.Contains("héros") 
-          || s.Contains("heros") 
+        string s when s.Contains("héros") 
+          || s.Contains("heros")
+          || s.Contains("ros")
           => CardType.Hero,
-        string s when s.Contains("lie") 
-          || s.Contains("all") 
-          || s.Contains("aisss")
-          || s.Contains("li")
-          => CardType.Ally,
-        string s when s.Contains("évén") 
+        string s when s.Contains("événement")
+          || s.Contains("évén")
+          || s.Contains("nement")
           || s.Contains("evé") 
           || s.Contains("évèn") 
           || s.Contains("èvén") 
@@ -122,32 +125,33 @@ namespace LOTR_CR.CardReaders.Models
           || s.Contains("hement") 
           || s.Contains("at") 
           || s.Contains("tach")
-          || s.Contains("nucueucur")
-          || s.Contains("ﬁaﬂacueneur")
-          || s.Contains("aha")
           => CardType.Attachment,
-        string s when s.Contains("tré") 
+        string s when s.Contains("trésor") 
+          || s.Contains("tré")
           || s.Contains("sor") 
-          || s.Contains("vnésok")
-          || s.Contains("ïrîïsäà")
-          || s == "tresor" 
           => CardType.Treasure,
         string s when s.Contains("lieu") 
           || s.Contains("li€u") 
           => CardType.Location,
-        string s when s.Contains("tris") 
-          || s.Contains('î') 
+        string s when s.Contains("allié")
+          || s.Contains("allie")
+          || s.Contains("all")
+          || s.Contains("lie")
+          || s.Contains("li")
+          => CardType.Ally,
+        string s when s.Contains("traîtrise")
+          || s.Contains("traitrise")
+          || s.Contains("tris")
           || s.Contains("ise") 
           || s.Contains("aî") 
-          || s.Contains("iraï") 
-          || s == "nuinusz,," 
+          || s.Contains("î")
           => CardType.Treachery,
-        string s when s.Contains("nnemi") 
-          || s.Contains("rameur") 
-          || s.Contains("nuinus") 
+        string s when s.Contains("ennemi") 
+          || s.Contains("nnemi")
           || s.Contains("nne") 
           || s.Contains("nn") 
           => CardType.Enemy,
+        string s when s.Contains("objectif") => CardType.Objective,
         _ => CardType.Objective,
       };
     }

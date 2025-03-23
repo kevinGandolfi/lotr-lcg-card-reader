@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Text.RegularExpressions;
 using ImageArranger;
 using ImageMagick;
@@ -9,12 +10,22 @@ using LOTR_CR.CardReaders.Models;
 class Program
 {
   private readonly static string BASE_LINK = "https://sda-src.cgbuilder.fr/images/carte/";
-  private readonly static string COLLECTION_NUMBER = "44/";
-  private readonly static int COLLECTION_NUMBER_INT = 44;
+  private readonly static string COLLECTION_NUMBER = "16/";
+  private readonly static int COLLECTION_NUMBER_INT = 16;
   private readonly static string FILE_EXTENSION_INPUT = ".jpg";
   private readonly static string FILE_EXTENSION_OUTPUT = ".png";
   private readonly static string DIRECTORY_PATH = @"..\..\..\CardDescriptions\";
   private readonly static string IMAGES_LOCAL_FOLDER = @"..\..\..\..\ImagesToPrint\";
+  private readonly static string BOTTOM_LABELS_LOCAL_FOLDER = @"..\..\..\BottomLabels\";
+  private readonly static string ALLIES_LOCAL_FOLDER = $@"{BOTTOM_LABELS_LOCAL_FOLDER}allies";
+  private readonly static string ATTACHMENTS_LOCAL_FOLDER = $@"{BOTTOM_LABELS_LOCAL_FOLDER}attachments";
+  private readonly static string ENEMIES_LOCAL_FOLDER = $@"{BOTTOM_LABELS_LOCAL_FOLDER}enemies";
+  private readonly static string EVENTS_LOCAL_FOLDER = $@"{BOTTOM_LABELS_LOCAL_FOLDER}events";
+  private readonly static string HEROES_LOCAL_FOLDER = $@"{BOTTOM_LABELS_LOCAL_FOLDER}heroes";
+  private readonly static string LOCATIONS_LOCAL_FOLDER = $@"{BOTTOM_LABELS_LOCAL_FOLDER}locations";
+  private readonly static string OBJECTIVES_LOCAL_FOLDER = $@"{BOTTOM_LABELS_LOCAL_FOLDER}objectives";
+  private readonly static string TREACHERIES_LOCAL_FOLDER = $@"{BOTTOM_LABELS_LOCAL_FOLDER}treacheries";
+  private readonly static string TREASURES_LOCAL_FOLDER = $@"{BOTTOM_LABELS_LOCAL_FOLDER}treasures";
 
   private static string _url = string.Empty;
   private static short _cardNumber = 1;
@@ -24,19 +35,22 @@ class Program
   {
     //DEBUG
 
-    _url = BuildUrl();
-    _url = GetUrlWithNewCardNumber("1");
-    MemoryStream stream = GetMemoryStreamFromHostedImage(_url);
-    Card cardTest = new(stream);
-    CardReader cardReaderTest = CardReaderFactory.GetCardReader(cardTest);
-    cardReaderTest.GetCardDescription().Write(@"..\..\..\result.png");
+    //_url = BuildUrl();
+    //_url = GetUrlWithNewCardNumber("12");
+    //MemoryStream stream = GetMemoryStreamFromHostedImage(_url);
+    //Card cardTest = new(stream);
+    //CardReader cardReaderTest = CardReaderFactory.GetCardReader(cardTest);
+    //cardReaderTest.GetCardDescription().Write(@"..\..\..\result.png");
 
     //DEBUG
 
     List<MagickImage> images = [];
 
     Console.WriteLine("Welcome to the card reader of Lord of the Rings: the Card Game");
-    Console.WriteLine("Select a mode: \n1 - Import from the website\n2 - Import from the local folder");
+    Console.WriteLine("Select a mode: \n" +
+      "1 - Import from the website\n" +
+      "2 - Import from the local folder\n" +
+      "3 - Create ground truth files");
     string? input = Console.ReadLine();
     int mode;
     while (true)
@@ -88,6 +102,10 @@ class Program
             {
               card.NumberOfCopies = EncounterCardNumbers.NumbersPerCollection[(COLLECTION_NUMBER_INT, cardNumber)];
             }
+            //if(card.Type != CardType.Quest)
+            //{
+            //  card.WriteBottomLabel(cardNumber + 751); // DEBUG
+            //}
             CardReader cardReader = CardReaderFactory.GetCardReader(card);
             MagickImage image = cardReader.GetCardDescription();
             image.AdaptiveResize((int)(image.Width * 1.905), (int)(image.Height * 1.843));
@@ -118,6 +136,29 @@ class Program
 
         PageArranger imageArranger = new(images);
         imageArranger.ArrangeOnPage();
+      }
+      else
+      {
+        Console.WriteLine("Folder not found.");
+      }
+    }
+    else if (mode == 3)
+    {
+      if (Directory.Exists(BOTTOM_LABELS_LOCAL_FOLDER))
+      {
+        FolderPathGroundTruthValueDictionary folderPathsWithGroundTruths = new()
+        {
+          { ALLIES_LOCAL_FOLDER, "ALLIÉ" },
+          { ATTACHMENTS_LOCAL_FOLDER, "ATTACHEMENT" },
+          { ENEMIES_LOCAL_FOLDER, "ENNEMI" },
+          { EVENTS_LOCAL_FOLDER, "ÉVÉNEMENT" },
+          { HEROES_LOCAL_FOLDER, "HÉROS" },
+          { LOCATIONS_LOCAL_FOLDER, "LIEU" },
+          { OBJECTIVES_LOCAL_FOLDER, "OBJECTIF" },
+          { TREASURES_LOCAL_FOLDER, "TRÉSOR" },
+          { TREACHERIES_LOCAL_FOLDER, "TRAÎTRISE" }
+        };
+        CreateGroundTruthFiles(folderPathsWithGroundTruths);
       }
       else
       {
@@ -250,5 +291,45 @@ class Program
     return _url.Contains($"A{FILE_EXTENSION_INPUT}")
       || _url.Contains($"B{FILE_EXTENSION_INPUT}")
       || _url.Contains($"C{FILE_EXTENSION_INPUT}");
+  }
+
+  private static void CreateGroundTruthFiles(FolderPathGroundTruthValueDictionary folderPathsAndGroundTruths)
+  {
+    foreach (string folderPath in folderPathsAndGroundTruths.Keys)
+    {
+      if (Directory.Exists(folderPath))
+      {
+        string[] imagePaths = Directory.GetFiles(folderPath, "*.png");
+        foreach (string imagePath in imagePaths)
+        {
+          string regExFileNameNoExtension = @"(\d+).png";
+          Match match = Regex.Match(imagePath, regExFileNameNoExtension);
+          if (match.Success)
+          {
+            string fileNameWithoutExtension = match.Groups[1].Value;
+            string filePath = $@"{folderPath}\{fileNameWithoutExtension}.gt.txt";
+            string content = folderPathsAndGroundTruths[folderPath];
+            File.WriteAllText(filePath, content);
+          }
+        }
+      }
+    }
+  }
+
+  /// <summary>
+  /// Represents a specific dictionary that matches a file path in the bottom labels folder with the value of the ground truth.
+  /// </summary>
+  public class FolderPathGroundTruthValueDictionary : Dictionary<string, string>
+  {
+    public new void Add(string folderPath, string groundTruthValue)
+    {
+      base.Add(folderPath, groundTruthValue);
+    }
+
+    public new string this[string folderPath]
+    {
+      get { return base[folderPath]; }
+      set { base[folderPath] = value; }
+    }
   }
 }
